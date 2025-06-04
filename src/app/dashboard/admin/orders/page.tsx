@@ -73,9 +73,9 @@ export default function OrdersPage() {
     );
   }
 
-  if (!orders?.data.length) {
-    return <ErrorMessage error="No orders found" />;
-  }
+  // if (!orders?.data.length) {
+  //   return <ErrorMessage error="No orders found" />;
+  // }
 
   return (
     <div className="container mx-auto p-4">

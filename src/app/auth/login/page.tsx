@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  // Clear localStorage when component mounts
   useEffect(() => {
     localStorage.clear();
   }, []);
@@ -26,19 +24,15 @@ export default function LoginPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
-        body: JSON.stringify({ 
-          email: email.trim(),
-          password: password.trim() 
-        }),
+        body: JSON.stringify({ email: email.trim(), password: password.trim() }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle API error responses
-        if (data.status_code === 401) {
+      if (data.status_code === 401) {
           setError(data.message || 'The email or password you entered is incorrect.');
         } else {
           setError(data.message || 'Login failed. Please try again.');
@@ -46,7 +40,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Success case
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data.user));
       localStorage.setItem('userRole', data.data.role);
@@ -55,75 +48,83 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard/user/product-list');
       }
-    } catch (err) {
+    } catch {
       setError('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f9f9f9]">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-        
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-center">
-            {error}
-          </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-              autoComplete="email"
-            />
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Left Panel */}
+      <div className="md:w-1/2 bg-[#2b3990] text-white flex flex-col items-center justify-center px-10 py-12">
+        <img src="/images/logo/logo-light.webp" alt="Sync Graphic" className="w-2/3 max-w-sm pb-10" />
+        <h1 className="text-3xl font-bold mb-4 tracking-wide uppercase text-white text-center">Your Gateway to</h1>
+        <h2 className="text-5xl font-extrabold mb-4 text-[#00aeef]">My Grocery App</h2>
+        <p className="text-xl mb-8 text-center">All you need is a little <span className="font-bold">Sync</span></p>
+      </div>
+      {/* Right Panel (Form) */}
+      <div className="md:w-1/2 flex items-center justify-center p-10 bg-white">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-[#2b3990]">Log in to your account</h2>
+            <p className="text-sm text-gray-500">Welcome back to My Grocery App</p>
           </div>
-          
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-          
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            className={`w-full bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] mb-4 transition-colors
-              ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-          >
-            {isSubmitting ? 'Logging in...' : 'Login'}
-          </button>
-          
-          <div className="text-center text-sm">
-            <span className="text-gray-600">Don't have an account? </span>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-center">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00aeef]"
+                required
+              />
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00aeef]"
+                required
+              />
+            </div>
+
             <button
-              onClick={() =>  router.push('/auth/signup')}
-              className="text-blue-500 hover:text-blue-700 font-medium"
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] transition-colors font-medium ${
+                isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
-              Sign up here
+              {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
-          </div>
-        </form>
+
+            <p className="mt-4 text-center text-sm">
+              Don’t have an account?{' '}
+              <button
+                type="button"
+                onClick={() => router.push('/auth/signup')}
+                className="text-[#00aeef] hover:underline font-medium"
+              >
+                Sign up here
+              </button>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );
