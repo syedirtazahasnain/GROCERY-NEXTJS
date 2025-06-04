@@ -91,9 +91,9 @@ export default function OrderDetailsPage() {
     );
   }
 
-  if (!order) {
-    return <ErrorMessage error="No orders found" />;
-  }
+  // if (!order) {
+  //   return <ErrorMessage error="No orders found" />;
+  // }
 
   return (
     <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
