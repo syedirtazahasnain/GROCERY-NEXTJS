@@ -155,6 +155,35 @@ export default function Index() {
     }
   };
 
+
+
+
+
+  const getCurrentDateTimeLocal = () => {
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, '0');
+  const year = now.getFullYear();
+  const month = pad(now.getMonth() + 1);
+  const day = pad(now.getDate());
+  const hours = pad(now.getHours());
+  const minutes = pad(now.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+
+
+useEffect(() => {
+  const minDate = getCurrentDateTimeLocal();
+  if (!lastDate || new Date(lastDate) < new Date(minDate)) {
+    setLastDate(minDate);
+  }
+}, [showDialog]); // Reset when modal opens
+
+
+
+
+
+
   return (
     <aside className={`z-20 hidden w-[15%] overflow-y-auto bg-[#2b3990] md:block flex-shrink-0 scrollbar-hide h-screen fixed top-0 left-0 text-[#fff]`}>
       <div className="px-4 py-6">
@@ -224,88 +253,90 @@ export default function Index() {
               </button>
 
               {showDialog && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-[15px] xl:rounded-[20px] shadow-lg w-full max-w-md p-6 relative">
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  try {
-                    
-                    const token = localStorage.getItem("token");
-                    if (!token) {
-                      router.push("/auth/login");
-                      return;
-                    }
-                    const date = new Date(lastDate);
-                    const pad = (n) => n.toString().padStart(2, '0');
-                    const year = date.getFullYear();
-                    const month = pad(date.getMonth() + 1);
-                    const day = pad(date.getDate());
-                    const hours = pad(date.getHours());
-                    const minutes = pad(date.getMinutes());
-                    const seconds = '00';
-                    const formatted_date = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-                    console.log('formatted_date',formatted_date);
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/order-date`, {
-                      method: 'POST',
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                      },
-                      body: JSON.stringify({
-                        date: formatted_date,
-                      })
-                    });
-                  
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                      toast.success(data.message || "Order Date Updated Successfully");
-                      setShowDialog(false);
-                    } else {
-                      if (data.errors) {
-                        Object.values(data.errors).forEach(errors => {
-                          errors.forEach(error => toast.error(error));
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-[15px] xl:rounded-[20px] shadow-lg w-full max-w-md p-6 relative">
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                          router.push("/auth/login");
+                          return;
+                        }
+                        const date = new Date(lastDate);
+                        const pad = (n) => n.toString().padStart(2, '0');
+                        const year = date.getFullYear();
+                        const month = pad(date.getMonth() + 1);
+                        const day = pad(date.getDate());
+                        const hours = pad(date.getHours());
+                        const minutes = pad(date.getMinutes());
+                        const seconds = '00';
+                        const formatted_date = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                        console.log('formatted_date', formatted_date);
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/order-date`, {
+                          method: 'POST',
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                          },
+                          body: JSON.stringify({
+                            date: formatted_date,
+                          })
                         });
-                      } else {
-                        toast.error(data.message || "Failed to update order date");
+
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                          toast.success(data.message || "Order Date Updated Successfully");
+                          setShowDialog(false);
+                        } else {
+                          if (data.errors) {
+                            Object.values(data.errors).forEach(errors => {
+                              errors.forEach(error => toast.error(error));
+                            });
+                          } else {
+                            toast.error(data.message || "Failed to update order date");
+                          }
+                        }
+                      } catch (error) {
+                        toast.error(error.message || "An unexpected error occurred");
                       }
-                    }
-                  } catch (error) {
-                    toast.error(error.message || "An unexpected error occurred");
-                  }
-                }}>
-                  <Input
-                    type="datetime-local"
-                    name="last_date"
-                    id="last_date"
-                    label="Ration Last Date"
-                    className="w-full"
-                    classNames={{ inputWrapper: "" }}
-                    isRequired
-                    value={lastDate}
-                    onChange={(e) => setLastDate(e.target.value)}
-                  />
-            
-                  <div className="flex justify-end gap-[10px] mt-4">
-                    <button
-                      type="button"
-                      className={`px-[15px] bg-[#f9f9f9] text-[#000] py-2 rounded-lg hover:bg-[#000] hover:text-[#fff] transition`}
-                      onClick={() => setShowDialog(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className={`px-[15px] bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] transition`}
-                    >
-                      Submit
-                    </button>
+
+                    }}>
+                      <Input
+                        type="datetime-local"
+                        name="last_date"
+                        id="last_date"
+                        label="Ration Last Date"
+                        className="w-full"
+                        classNames={{ inputWrapper: "" }}
+                        isRequired
+                        value={lastDate}
+                        onChange={(e) => setLastDate(e.target.value)}
+                          min={getCurrentDateTimeLocal()} // Prevent selecting past dates
+
+                      />
+
+                      <div className="flex justify-end gap-[10px] mt-4">
+                        <button
+                          type="button"
+                          className={`px-[15px] bg-[#f9f9f9] text-[#000] py-2 rounded-lg hover:bg-[#000] hover:text-[#fff] transition`}
+                          onClick={() => setShowDialog(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className={`px-[15px] bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] transition`}
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                </form>
-              </div>
-            </div>
+                </div>
               )}
 
             </>
