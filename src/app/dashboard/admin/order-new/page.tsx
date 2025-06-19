@@ -107,27 +107,6 @@ const [empIdList, setEmpIdList] = useState<string[]>([]);
     router.push(`?${params.toString()}`);
   };
 
-  // const handleSearch = () => {
-  //   const formatDate = (date) => {
-  //     if (!date) return '';
-  //     const d = new Date(date);
-  //     const pad = (n) => n.toString().padStart(2, '0');
-  //     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  //   };
-
-  //   const startDate = formatDate(dateRange.start);
-  //   const endDate = formatDate(dateRange.end);
-
-  //   const empIds = searchEmpId
-  //     .split(/[, ]+/)
-  //     .filter(id => id.trim() !== '')
-  //     .map(id => id.trim());
-
-  //   fetchOrders('1', empIds, startDate, endDate);
-  // };
-
-
-
   const handleSearch = () => {
   const formatDate = (date) => {
     if (!date) return '';
