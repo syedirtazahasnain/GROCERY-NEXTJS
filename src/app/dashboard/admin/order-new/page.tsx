@@ -40,6 +40,8 @@ export default function OrdersPage() {
   const [dateRange, setDateRange] = useState<{ start?: Date, end?: Date }>({});
   const [isSearching, setIsSearching] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+const [empIdList, setEmpIdList] = useState<string[]>([]);
+
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -105,24 +107,55 @@ export default function OrdersPage() {
     router.push(`?${params.toString()}`);
   };
 
+  // const handleSearch = () => {
+  //   const formatDate = (date) => {
+  //     if (!date) return '';
+  //     const d = new Date(date);
+  //     const pad = (n) => n.toString().padStart(2, '0');
+  //     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  //   };
+
+  //   const startDate = formatDate(dateRange.start);
+  //   const endDate = formatDate(dateRange.end);
+
+  //   const empIds = searchEmpId
+  //     .split(/[, ]+/)
+  //     .filter(id => id.trim() !== '')
+  //     .map(id => id.trim());
+
+  //   fetchOrders('1', empIds, startDate, endDate);
+  // };
+
+
+
   const handleSearch = () => {
-    const formatDate = (date) => {
-      if (!date) return '';
-      const d = new Date(date);
-      const pad = (n) => n.toString().padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-    };
-
-    const startDate = formatDate(dateRange.start);
-    const endDate = formatDate(dateRange.end);
-
-    const empIds = searchEmpId
-      .split(/[, ]+/)
-      .filter(id => id.trim() !== '')
-      .map(id => id.trim());
-
-    fetchOrders('1', empIds, startDate, endDate);
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   };
+
+  const startDate = formatDate(dateRange.start);
+  const endDate = formatDate(dateRange.end);
+
+  // Include any final value still in input before search
+  const allEmpIds = [...empIdList];
+  const trimmed = searchEmpId.trim();
+  if (trimmed && !allEmpIds.includes(trimmed)) {
+    allEmpIds.push(trimmed);
+  }
+
+  fetchOrders('1', allEmpIds, startDate, endDate);
+};
+
+
+
+
+
+
+
+
   const generateOrderReport = async () => {
     try {
       setIsGeneratingReport(true);
@@ -183,16 +216,50 @@ export default function OrdersPage() {
         <div>
           <div className='flex gap-2 justify-between items-center'>
             <div className='flex gap-2'>
-              <Input
-                type="text"
-                placeholder="Search Emp ID (comma separated)..."
-                className="max-w-xs"
-                value={searchEmpId}
-                onChange={(e) => setSearchEmpId(e.target.value)}
-                classNames={{
-                  inputWrapper: "bg-white border-2"
-                }}
-              />
+             <div className="max-w-xs">
+  
+
+  {/* Input field + tags container */}
+  <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+    {/* Tags */}
+    {empIdList.map((id, index) => (
+      <span
+        key={index}
+        className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+      >
+        {id}
+        <button
+          onClick={() =>
+            setEmpIdList((prev) => prev.filter((_, i) => i !== index))
+          }
+          className="text-red-300 text-xs"
+        >
+          x
+        </button>
+      </span>
+    ))}
+
+    {/* Actual input */}
+    <input
+      type="text"
+      value={searchEmpId}
+      onChange={(e) => setSearchEmpId(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          const trimmed = searchEmpId.trim();
+          if (trimmed && !empIdList.includes(trimmed)) {
+            setEmpIdList((prev) => [...prev, trimmed]);
+            setSearchEmpId("");
+          }
+        }
+      }}
+      placeholder="Search Emp ID and press enter"
+      className="flex-grow outline-none bg-transparent py-1 px-1 text-xs"
+    />
+  </div>
+</div>
+
               <DateRangePicker
                 className="max-w-xs"
                 value={dateRange}
@@ -211,6 +278,14 @@ export default function OrdersPage() {
                   {isSearching ? 'Searching...' : 'Search'}
                 </button>
               </div>
+              <div className='shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-200  transition-all duration-300 ease-in-out '>
+                <button
+                  className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2"
+                  onClick={clearFilters}
+                >
+                  Clear Filters
+                </button>
+              </div>
             </div>
             <div className='shadow-sm border-[2px] rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#1a2a7a] text-[#fff] transition-all duration-300 ease-in-out border-[#2b3990]'>
               <button
@@ -223,14 +298,7 @@ export default function OrdersPage() {
               </button>
             </div>
           </div>
-          <div className='flex gap-2 mt-2'>
-            <button
-              className="text-xs text-gray-600 hover:text-gray-800"
-              onClick={clearFilters}
-            >
-              Clear Filters
-            </button>
-          </div>
+          
         </div>
 
         {loading ? (

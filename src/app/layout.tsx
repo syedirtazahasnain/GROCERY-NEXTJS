@@ -1,8 +1,6 @@
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { EmployeeProvider } from '../app/context/EmployeeContext';
-
 
 export const metadata = {
   title: "Next.js",
@@ -17,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <EmployeeProvider>
           {children}
           <ToastContainer
             position="top-right"
@@ -31,7 +28,6 @@ export default function RootLayout({
             pauseOnHover
             theme="light"
           />
-        </EmployeeProvider>
       </body>
     </html>
   );

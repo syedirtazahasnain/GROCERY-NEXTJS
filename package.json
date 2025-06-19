@@ -17,6 +17,7 @@
     "@heroui/theme": "^2.4.13",
     "@mui/icons-material": "^7.0.1",
     "@mui/material": "^7.0.1",
+    "@tanstack/react-query": "^5.80.7",
     "@types/react-toastify": "^4.1.0",
     "axios": "^1.8.3",
     "framer-motion": "^12.7.4",
@@ -29,6 +30,7 @@
     "recharts": "^2.15.2",
     "sweetalert2": "^11.19.1",
     "sweetalert2-react-content": "^5.1.0",
+    "use-debounce": "^10.0.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
