@@ -20,6 +20,8 @@ interface User {
   location: string | null;
   status: string;
   role: string;
+     eligible: any;
+ 
 }
 
 interface PaginatedUsers {
@@ -42,6 +44,19 @@ interface PaginatedUsers {
   total: number;
 }
 
+
+interface SearchParams {
+  emp_id: string;
+  name: string;
+}
+
+interface SearchPayload {
+  emp_id: string[];
+  name: string[];
+}
+
+
+
 export default function Page() {
   const [users, setUsers] = useState<PaginatedUsers | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,12 +67,13 @@ export default function Page() {
     name: "",
     email: "",
     status: "",
+    eligible: 0,
   });
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string[]>
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchParams, setSearchParams] = useState({
+  const [searchParams, setSearchParams] = useState<SearchParams>({
     emp_id: "",
     name: "",
   });
@@ -66,13 +82,15 @@ export default function Page() {
 
   const router = useRouter();
   const urlSearchParams = useSearchParams();
-  const currentPage = urlSearchParams.get('page') || '1';
+  const currentPage = urlSearchParams.get("page") || "1";
 
-  const fetchUsers = async (searchPayload = null) => {
+  
+
+  const fetchUsers = async (searchPayload:SearchPayload | null = null) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push('/auth/login');
+        router.push("/auth/login");
         return;
       }
 
@@ -81,23 +99,23 @@ export default function Page() {
         url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/users/all`;
       }
       const response = await fetch(url, {
-        method: searchPayload ? 'POST' : 'GET',
+        method: searchPayload ? "POST" : "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: searchPayload ? JSON.stringify(searchPayload) : null,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error("Failed to fetch users");
       }
 
       const data = await response.json();
       setUsers(data.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users');
-      toast.error(err instanceof Error ? err.message : 'Failed to load users');
+      setError(err instanceof Error ? err.message : "Failed to load users");
+      toast.error(err instanceof Error ? err.message : "Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -111,16 +129,16 @@ export default function Page() {
     const { name, value } = e.target;
     setSearchParams((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSearch = () => {
-    setLoading(true);
+    // setLoading(true);
     const splitAndTrim = (input: string) =>
       input
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
 
-    const payload = {
+     const payload  = {
       emp_id:
         empIdList.length > 0 ? empIdList : splitAndTrim(searchParams.emp_id),
       name: nameList.length > 0 ? nameList : splitAndTrim(searchParams.name),
@@ -134,24 +152,35 @@ export default function Page() {
       emp_id: "",
       name: "",
     });
-    setLoading(true);
+     setEmpIdList([]);
+  setNameList([]);
+
     fetchUsers();
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear validation error when user types
-    if (validationErrors[name]) {
-      setValidationErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
+ const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+
+  // Convert 'eligible' value from string to number
+  const updatedValue = name === "eligible" ? Number(value) : value;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: updatedValue,
+  }));
+
+  // Clear validation error when user types/selects
+  if (validationErrors[name]) {
+    setValidationErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
+  }
+};
+
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -159,6 +188,7 @@ export default function Page() {
       name: user.name,
       email: user.email,
       status: user.status,
+      eligible: user.eligible,
     });
     setValidationErrors({});
     setIsOpen(true);
@@ -168,9 +198,9 @@ export default function Page() {
     try {
       if (!selectedUser) return;
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push('/auth/login');
+        router.push("/auth/login");
         return;
       }
 
@@ -180,9 +210,9 @@ export default function Page() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/users-update/${selectedUser.id}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
@@ -197,10 +227,10 @@ export default function Page() {
           toast.error("Please fix the validation errors");
           return;
         }
-        throw new Error(data.message || 'Failed to update user');
+        throw new Error(data.message || "Failed to update user");
       }
 
-      toast.success(data.message || 'User updated successfully');
+      toast.success(data.message || "User updated successfully");
       setIsOpen(false);
 
       // Refresh the user list
@@ -215,7 +245,7 @@ export default function Page() {
       const updatedData = await updatedResponse.json();
       setUsers(updatedData.data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to update user');
+      toast.error(err instanceof Error ? err.message : "Failed to update user");
     } finally {
       setIsSubmitting(false);
     }
@@ -263,11 +293,10 @@ export default function Page() {
           />
         </div>
 
-        <div>
+        <div className="relative mb-6">
           <div className="flex gap-2">
             {/* EMPLOYEE ID INPUT (taggable) */}
             <div className="max-w-xs">
-             
               <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
                 {empIdList.map((id, index) => (
                   <span
@@ -304,14 +333,17 @@ export default function Page() {
                     }
                   }}
                   className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[206px]"
-                  placeholder="Search Employee ID and press Enter"
+                  placeholder={
+                    empIdList.length === 0
+                      ? "Search Employee ID and press Enter"
+                      : ""
+                  }
                 />
               </div>
             </div>
 
             {/* EMPLOYEE NAME INPUT (taggable same as emp_id) */}
             <div className="max-w-xs">
-              
               <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
                 {nameList.map((name, index) => (
                   <span
@@ -347,8 +379,12 @@ export default function Page() {
                       }
                     }
                   }}
-                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs  md:w-[236px]"
-                  placeholder=" Search Employee Name and press Enter"
+                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[236px]"
+                  placeholder={
+                    nameList.length === 0
+                      ? "Search Employee Name and press Enter"
+                      : ""
+                  }
                 />
               </div>
             </div>
@@ -364,7 +400,7 @@ export default function Page() {
             </div>
 
             {/* CLEAR BUTTON */}
-            {(searchParams.emp_id || searchParams.name) && (
+            {(empIdList.length > 0 || nameList.length > 0) && (
               <div
                 onClick={handleClearSearch}
                 className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-500 hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-gray-500 cursor-pointer"
@@ -375,8 +411,9 @@ export default function Page() {
               </div>
             )}
           </div>
-        </div>
 
+          {/* Suggestions dropdown could be added here if needed */}
+        </div>
         {users?.data.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-gray-500">
@@ -518,6 +555,8 @@ export default function Page() {
                   <option value="Permanent">Permanent</option>
                   <option value="Probation">Probation</option>
                   <option value="Contract">Contract</option>
+                                    
+
                   <option value="Internship">Internship</option>
                 </select>
                 {validationErrors.status && (
@@ -526,6 +565,26 @@ export default function Page() {
                   </p>
                 )}
               </div>
+              <div>
+  <select
+    name="eligible"
+    value={formData.eligible?.toString() || ""}
+    onChange={handleChange}
+    className={`w-full border rounded px-3 py-2 ${
+      validationErrors.eligible ? "border-red-500" : ""
+    }`}
+  >
+    <option value="">Select Eligibility</option>
+    <option value="1">Rashan Eligible</option>
+    <option value="0">Not Eligible</option>
+  </select>
+  {validationErrors.eligible && (
+    <p className="mt-1 text-sm text-red-500">
+      {validationErrors.eligible[0]}
+    </p>
+  )}
+</div>
+
             </div>
 
             <div className="mt-6 flex justify-end gap-2">

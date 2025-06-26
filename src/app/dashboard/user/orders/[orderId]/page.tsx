@@ -165,7 +165,7 @@ export default function OrderDetailsPage() {
                     try {
                       const token = localStorage.getItem("token");
                       if (!token) {
-                        toast.error("Unauthorized! Please login again.");
+                        toast.error("thorized! Please login again.");
                         router.push("/auth/login");
                         return;
                       }

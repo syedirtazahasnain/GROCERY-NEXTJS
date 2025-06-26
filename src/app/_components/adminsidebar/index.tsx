@@ -13,6 +13,7 @@ import {
   AddShoppingCart,
   Assessment,
   Category,
+  PriceChange,
   ProductionQuantityLimits,
   ShoppingCartCheckout,
   Badge,
@@ -161,7 +162,7 @@ export default function Index() {
 
   const getCurrentDateTimeLocal = () => {
   const now = new Date();
-  const pad = (n) => n.toString().padStart(2, '0');
+  const pad = (n :number) => n.toString().padStart(2, '0');
   const year = now.getFullYear();
   const month = pad(now.getMonth() + 1);
   const day = pad(now.getDate());
@@ -244,6 +245,13 @@ useEffect(() => {
                 <Category className="w-5 h-5" />
                 <span className="ml-4">Products</span>
               </Link>
+              <Link
+                href="/dashboard/admin/producthistory"
+                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+              >
+                <PriceChange className="w-5 h-5" />
+                <span className="ml-4">Product history</span>
+              </Link>
               <button
                 onClick={() => setShowDialog(true)}
                 className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
@@ -264,7 +272,7 @@ useEffect(() => {
                           return;
                         }
                         const date = new Date(lastDate);
-                        const pad = (n) => n.toString().padStart(2, '0');
+                        const pad = (n :number) => n.toString().padStart(2, '0');
                         const year = date.getFullYear();
                         const month = pad(date.getMonth() + 1);
                         const day = pad(date.getDate());
@@ -300,7 +308,7 @@ useEffect(() => {
                             toast.error(data.message || "Failed to update order date");
                           }
                         }
-                      } catch (error) {
+                      } catch (error: any) {
                         toast.error(error.message || "An unexpected error occurred");
                       }
 
