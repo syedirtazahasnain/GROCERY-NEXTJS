@@ -246,7 +246,7 @@ useEffect(() => {
                 <span className="ml-4">Products</span>
               </Link>
               <Link
-                href="/dashboard/admin/producthistory"
+                href="/dashboard/admin/products/price-history"
                 className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
               >
                 <PriceChange className="w-5 h-5" />
