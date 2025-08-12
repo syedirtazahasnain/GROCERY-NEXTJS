@@ -1,14 +1,20 @@
+
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Header from "@/app/_components/adminheader/index";
 import Sidebar from "@/app/_components/adminsidebar/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
-import { DriveFileRenameOutline, Create } from "@mui/icons-material";
+import {
+  DriveFileRenameOutline,
+  Create,
+  Search,
+  Close,
+} from "@mui/icons-material";
 import { toast } from "react-toastify";
-import { Dialog } from '@headlessui/react';
+import { Dialog } from "@headlessui/react";
 import ErrorMessage from "@/app/_components/error/index";
 import Loader from "@/app/_components/loader/index";
 
@@ -45,40 +51,56 @@ interface PaginatedProducts {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<PaginatedProducts | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentPage = searchParams.get('page') || '1';
+  const currentPage = searchParams.get("page") || "1";
   const [isOpen, setIsOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState("");
   const [orderUpdate, setOrderUpdate] = useState(false);
+
+  // Search related states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerms, setSearchTerms] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-          router.push('/auth/login');
+          router.push("/auth/login");
           return;
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/products?page=${currentPage}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/products?page=${currentPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          throw new Error("Failed to fetch products");
         }
 
         const data = await response.json();
         setProducts(data.data);
+        setFilteredProducts(data.data.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load products');
-        toast.error(err instanceof Error ? err.message : 'Failed to load products');
+        setError(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
+        toast.error(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
       } finally {
         setLoading(false);
       }
@@ -87,11 +109,130 @@ export default function ProductsPage() {
     fetchProducts();
   }, [currentPage, router]);
 
-  const toggleProductStatus = async (productId: number, currentStatus: number) => {
+
+  const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/auth/login");
+          return;
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/products?page=${currentPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+        setProducts(data.data);
+        setFilteredProducts(data.data.data);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
+        toast.error(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.length > 0 && products) {
+      const matched = products.data.filter(
+        (product) =>
+          product.name.toLowerCase().includes(query.toLowerCase()) &&
+          !searchTerms.includes(product.name)
+      );
+      setSuggestions(matched);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Add search term to the array
+  const addSearchTerm = (term: string) => {
+    if (term && !searchTerms.includes(term)) {
+      setSearchTerms([...searchTerms, term]);
+    }
+    setSearchQuery("");
+    setShowSuggestions(false);
+  };
+
+  // Remove search term from the array
+  const removeSearchTerm = (term: string) => {
+    setSearchTerms(searchTerms.filter((t) => t !== term));
+  };
+
+  // Handle search submission
+  const handleSearch = () => {
+    if (!products) return;
+
+    if (searchTerms.length === 0) {
+      setFilteredProducts(products.data);
+      return;
+    }
+
+    const filtered = products.data.filter((product) =>
+      searchTerms.some((term) =>
+        product.name.toLowerCase().includes(term.toLowerCase())
+      )
+    );
+    setFilteredProducts(filtered);
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (product: Product) => {
+    addSearchTerm(product.name);
+  };
+
+  // Handle enter key press
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && searchQuery) {
+      addSearchTerm(searchQuery);
+    }
+  };
+
+  const toggleProductStatus = async (
+    productId: number,
+    currentStatus: number
+  ) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push('/auth/login');
+        router.push("/auth/login");
         return;
       }
 
@@ -108,7 +249,7 @@ export default function ProductsPage() {
       );
 
       if (!productResponse.ok) {
-        throw new Error('Failed to fetch product details');
+        throw new Error("Failed to fetch product details");
       }
 
       const productData = await productResponse.json();
@@ -118,9 +259,9 @@ export default function ProductsPage() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/store-products`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -131,43 +272,59 @@ export default function ProductsPage() {
             measure: product.measure,
             type: product.type,
             status: newStatus,
-            order_update: orderUpdate ? 1 : 0
+            order_update: orderUpdate ? 1 : 0,
           }),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update product status');
+        throw new Error(errorData.message || "Failed to update product status");
       }
 
       // Update local state
-      setProducts(prev => {
+      setProducts((prev) => {
         if (!prev) return null;
         return {
           ...prev,
-          data: prev.data.map(product =>
-            product.id === productId ? { ...product, status: newStatus } : product
-          )
+          data: prev.data.map((product) =>
+            product.id === productId
+              ? { ...product, status: newStatus }
+              : product
+          ),
         };
       });
 
-      toast.success('Product status updated successfully');
+      // Update filtered products if needed
+      setFilteredProducts((prev) =>
+        prev.map((product) =>
+          product.id === productId ? { ...product, status: newStatus } : product
+        )
+      );
+
+      toast.success("Product status updated successfully");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to update status');
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update status"
+      );
     }
   };
 
+  const clearSearch = ()=>{
+    setSearchTerms([])
+    fetchProducts();
+  }
+
   const handlePriceUpdate = async () => {
     if (!currentProduct || !price) {
-      toast.error('Please enter a valid price');
+      toast.error("Please enter a valid price");
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        router.push('/auth/login');
+        router.push("/auth/login");
         return;
       }
 
@@ -175,9 +332,9 @@ export default function ProductsPage() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/store-products`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -188,7 +345,7 @@ export default function ProductsPage() {
             measure: currentProduct.measure,
             type: currentProduct.type,
             status: currentProduct.status,
-            order_update: orderUpdate ? 1 : 0
+            order_update: orderUpdate ? 1 : 0,
           }),
         }
       );
@@ -197,29 +354,40 @@ export default function ProductsPage() {
         const errorData = await response.json();
         if (errorData.errors) {
           // Handle validation errors
-          const errorMessages = Object.values(errorData.errors).flat().join(', ');
+          const errorMessages = Object.values(errorData.errors)
+            .flat()
+            .join(", ");
           throw new Error(errorMessages);
         }
-        throw new Error(errorData.message || 'Failed to update product price');
+        throw new Error(errorData.message || "Failed to update product price");
       }
 
       // Update local state
-      setProducts(prev => {
+      setProducts((prev) => {
         if (!prev) return null;
         return {
           ...prev,
-          data: prev.data.map(product =>
+          data: prev.data.map((product) =>
             product.id === currentProduct.id ? { ...product, price } : product
-          )
+          ),
         };
       });
 
-      toast.success('Product price updated successfully');
+      // Update filtered products
+      setFilteredProducts((prev) =>
+        prev.map((product) =>
+          product.id === currentProduct.id ? { ...product, price } : product
+        )
+      );
+
+      toast.success("Product price updated successfully");
       setIsOpen(false);
-      setPrice('');
-      setOrderUpdate(false); 
+      setPrice("");
+      setOrderUpdate(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to update price');
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update price"
+      );
     }
   };
 
@@ -241,19 +409,145 @@ export default function ProductsPage() {
         <Sidebar />
       </div>
       <div className="w-full mx-auto space-y-4 p-4">
-        <div><Header /></div>
+        <div>
+          <Header />
+        </div>
         <div className="px-6 py-6 bg-[#f9f9f9] rounded-[20px] xl:rounded-[25px] text-[#2b3990]">
           <h1 className="text-2xl font-bold my-0">All Products</h1>
           <Breadcrumb items={[{ label: "Dashboard" }, { label: "Products" }]} />
         </div>
 
+        {/* Search Component */}
+        <div className="relative mb-6" ref={searchRef}>
+          <div className="flex gap-2">
+            {/* SEARCH INPUT WITH TAGS */}
+            <div className="max-w-xs">
+              <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+                {searchTerms.map((term, index) => (
+                  <span
+                    key={index}
+                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+                  >
+                    {term}
+                    <button
+                      onClick={() => removeSearchTerm(term)}
+                      className="text-red-300 text-xs"
+                    >
+                      x
+                    </button>
+                  </span>
+                ))}
+
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder={
+                    searchTerms.length === 0 ? "Search products..." : ""
+                  }
+                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[206px]"
+                />
+              </div>
+            </div>
+
+            {/* SEARCH BUTTON */}
+            <div
+              onClick={handleSearch}
+              className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-[#2b3990] cursor-pointer"
+            >
+              <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
+                Search
+              </button>
+            </div>
+
+            {/* CLEAR BUTTON */}
+            {searchTerms.length > 0 && (
+              <div
+                onClick={clearSearch}
+                className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-500 hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-gray-500 cursor-pointer"
+              >
+                <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Suggestions dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute z-10 mt-1 w-auto bg-white shadow-lg rounded-[15px] border border-gray-200 max-h-60 overflow-auto">
+              {suggestions.map((product) => {
+                const isSelected = searchTerms.includes(product.name);
+                return (
+                  <div
+                    key={product.id}
+                    className={`px-4 py-2 flex items-center ${
+                      isSelected
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "hover:bg-gray-100 cursor-pointer"
+                    }`}
+                    onClick={() =>
+                      !isSelected && handleSuggestionClick(product)
+                    }
+                  >
+                    <img
+                      src={
+                        product.image
+                          ? `${process.env.NEXT_PUBLIC_BACKEND_URL_PUBLIC}${product.image}`
+                          : "/images/items/product-default.png"
+                      }
+                      alt={product.name}
+                      className={`w-8 h-8 object-cover mr-3 rounded ${
+                        isSelected ? "opacity-50" : ""
+                      }`}
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "/images/items/product-default.png";
+                      }}
+                    />
+                    <div>
+                      <p
+                        className={`font-medium ${
+                          isSelected ? "text-gray-400" : "text-[#2b3990]"
+                        }`}
+                      >
+                        {product.name}
+                        {isSelected && (
+                          <span className="ml-2 text-xs text-gray-500">
+                            (already selected)
+                          </span>
+                        )}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          isSelected ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {product.type} • {product.price} Rs
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-[10px] xl:gap-[15px] mb-8">
-          {products.data.map((product) => (
-            <div key={product.id} className="bg-white rounded-[20px] border-[1px] border-[#2b3990] border-opacity-40 overflow-hidden relative">
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-[20px] border-[1px] border-[#2b3990] border-opacity-40 overflow-hidden relative"
+            >
               <div className="flex flex-col h-full">
                 <div className="bg-[#f9f9f9] overflow-hidden w-full">
                   <img
-                    src={product.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL_PUBLIC}${product.image}` : "/images/items/product-default.png"}
+                    src={
+                      product.image
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL_PUBLIC}${product.image}`
+                        : "/images/items/product-default.png"
+                    }
                     alt=""
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -269,17 +563,17 @@ export default function ProductsPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="my-0 text-xs">{product.type}</p>
-                    <p className="my-0 text-sm font-semibold">{product.measure}</p>
+                    <p className="my-0 text-sm font-semibold">
+                      {product.measure}
+                    </p>
                   </div>
-                  <div className='relative flex items-center gap-[10px]'>
+                  <div className="relative flex items-center gap-[10px]">
                     <p className="text-xl font-semibold">
                       {product.price}{" "}
-                      <span className="pl-[2px] text-sm font-normal">
-                        Rs
-                      </span>
+                      <span className="pl-[2px] text-sm font-normal">Rs</span>
                     </p>
                     <button
-                      className='text-xs relative group'
+                      className="text-xs relative group"
                       onClick={() => {
                         setCurrentProduct(product);
                         setPrice(product.price);
@@ -300,30 +594,45 @@ export default function ProductsPage() {
                   href={`/dashboard/admin/products/edit/${product.id}`}
                   className="text-[#2b3990] hover:text-[#00aeef] relative group"
                 >
-                  <p className='my-0 px-[10px] bg-[#00aeef] text-[#fff] rounded text-xs uppercase'>Edit</p>
+                  <p className="my-0 px-[10px] bg-[#00aeef] text-[#fff] rounded text-xs uppercase">
+                    Edit
+                  </p>
                 </Link>
               </div>
-              <div className='absolute bottom-[10px] right-[10px] group'>
+              <div className="absolute bottom-[10px] right-[10px] group">
                 <button
-                  onClick={() => toggleProductStatus(product.id, product.status)}
-                  className={`w-[30px] h-4 flex items-center rounded-full p-1 transition duration-300 ease-in-out ${product.status === 1 ? 'bg-[#2b3990]' : 'bg-gray-300'
-                    }`}
+                  onClick={() =>
+                    toggleProductStatus(product.id, product.status)
+                  }
+                  className={`w-[30px] h-4 flex items-center rounded-full p-1 transition duration-300 ease-in-out ${
+                    product.status === 1 ? "bg-[#2b3990]" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`bg-white w-2.5 h-2.5 rounded-full shadow-md transform duration-300 ease-in-out ${product.status === 1 ? 'translate-x-[13px]' : 'translate-x-0'
-                      }`}
+                    className={`bg-white w-2.5 h-2.5 rounded-full shadow-md transform duration-300 ease-in-out ${
+                      product.status === 1
+                        ? "translate-x-[13px]"
+                        : "translate-x-0"
+                    }`}
                   />
                 </button>
                 <span className="absolute top-[-20px] right-[0px] my-0 px-[5px] py-[2px] text-[10px] text-white bg-[#c00] rounded opacity-0 group-hover:opacity-100 transition text-nowrap">
-                  {product.status === 1 ? 'Disable Product' : 'Enable Product'}
+                  {product.status === 1 ? "Disable Product" : "Enable Product"}
                 </span>
               </div>
             </div>
           ))}
         </div>
 
-        <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-          <div className="fixed inset-0 bg-black bg-opacity-40" aria-hidden="true"></div>
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          className="relative z-50"
+        >
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40"
+            aria-hidden="true"
+          ></div>
           <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
             <Dialog.Panel className="bg-white rounded-xl max-w-sm w-full p-6 space-y-4">
               <Dialog.Title className="text-lg font-semibold text-[#2b3990]">
@@ -346,7 +655,10 @@ export default function ProductsPage() {
                   onChange={(e) => setOrderUpdate(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 text-[#2b3990] focus:ring-[#2b3990]"
                 />
-                <label htmlFor="orderEffect" className="ml-2 text-sm text-gray-700">
+                <label
+                  htmlFor="orderEffect"
+                  className="ml-2 text-sm text-gray-700"
+                >
                   Order Effect
                 </label>
               </div>
@@ -376,20 +688,21 @@ export default function ProductsPage() {
           {products.links.map((link, index) => {
             if (link.url === null) return null;
 
-            const page = new URL(link.url).searchParams.get('page') || '1';
+            const page = new URL(link.url).searchParams.get("page") || "1";
             const isActive = link.active;
             const label = link.label
-              .replace('&laquo; Previous', '«')
-              .replace('Next &raquo;', '»');
+              .replace("&laquo; Previous", "«")
+              .replace("Next &raquo;", "»");
 
             return (
               <Link
                 key={index}
                 href={`/dashboard/admin/products?page=${page}`}
-                className={`px-4 py-2 rounded-lg border ${isActive
-                  ? 'bg-[#2b3990] text-white border-blue-500'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
+                className={`px-4 py-2 rounded-lg border ${
+                  isActive
+                    ? "bg-[#2b3990] text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
               >
                 {label}
               </Link>
