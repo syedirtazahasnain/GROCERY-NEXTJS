@@ -3,8 +3,12 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const metadata = {
-  title: "Twenty Four Seven Consultancy (SMC-PVT) LTD",
-  description: "Twenty Four Seven Consultancy is an IT solution and Software company offering BPO, Digital Marketing, and Healthcare services like Medical Billing and Revenue Cycle Management, plus Web Development and call center support for optimized operations.",
+   title: "Twenty Four Seven Consultancy (SMC-PVT) LTD",
+  description:
+    "Twenty Four Seven Consultancy is an IT solution and Software company offering BPO, Digital Marketing, and Healthcare services like Medical Billing and Revenue Cycle Management, plus Web Development and call center support for optimized operations.",
+  alternates: {
+    canonical: "https://ration.24-7consultancy.pk/",
+  },
 };
 
 export default function RootLayout({
