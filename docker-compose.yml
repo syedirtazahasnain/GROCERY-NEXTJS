@@ -11,8 +11,8 @@ services:
     ports:
       - "3001:3001"
     environment:
-      NEXT_PUBLIC_BACKEND_URL: http://31.97.111.241:8083/api
-      NEXT_PUBLIC_BACKEND_URL_PUBLIC: http://31.97.111.241:8083/storage/public/
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      NEXT_PUBLIC_BACKEND_URL_PUBLIC: ${NEXT_PUBLIC_BACKEND_URL_PUBLIC}
     networks:
       - rashan-network
 
