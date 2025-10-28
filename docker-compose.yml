@@ -1,13 +1,12 @@
-version: '3.8'
 
 services:
   rashan-frontend:
     build:
-      context: ./rashanFront
+      context: .
     container_name: rashan-frontend
     working_dir: /app
     volumes:
-      - ./rashanFront:/app
+      - .:/app
     ports:
       - "3001:3001"
     environment:
