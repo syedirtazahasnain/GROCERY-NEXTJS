@@ -17,4 +17,4 @@ services:
 
 networks:
   rashan-network:
-    external: true
+    external: false
