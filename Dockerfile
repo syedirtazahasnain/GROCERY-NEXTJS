@@ -4,10 +4,10 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Copy only package files
+COPY package*.json ./
 
-# Install dependencies with legacy peer deps flag
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the code
@@ -16,8 +16,11 @@ COPY . .
 # Build the frontend
 RUN npm run build
 
-# Expose the app on port 3001
+# ✅ Add this line (important for when volume overwrites /app)
+ENV PATH=/app/node_modules/.bin:$PATH
+
+# Expose port
 EXPOSE 3001
 
-# Run Next.js app on port 3001
+# Run Next.js app
 CMD ["npm", "run", "start", "--", "-p", "3001"]
