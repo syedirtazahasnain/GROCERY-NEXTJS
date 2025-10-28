@@ -41,7 +41,7 @@ export default function Page() {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/product/import`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/employees/import`,
         {
           method: "POST",
           headers: {
