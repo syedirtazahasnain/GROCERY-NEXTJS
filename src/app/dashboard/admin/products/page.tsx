@@ -7,6 +7,7 @@ import Link from "next/link";
 import Header from "@/app/_components/adminheader/index";
 import Sidebar from "@/app/_components/adminsidebar/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import {
   DriveFileRenameOutline,
   Create,
@@ -419,21 +420,21 @@ export default function ProductsPage() {
 
         {/* Search Component */}
         <div className="relative mb-6" ref={searchRef}>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {/* SEARCH INPUT WITH TAGS */}
             <div className="max-w-xs">
-              <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+              <div className="w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px] bg-gray-100">
                 {searchTerms.map((term, index) => (
                   <span
                     key={index}
-                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex justify-between items-center gap-1 mb-[2px]"
                   >
                     {term}
                     <button
                       onClick={() => removeSearchTerm(term)}
                       className="text-red-300 text-xs"
                     >
-                      x
+                      <XMarkIcon className="h-4 w-4 text-[#fff]" />
                     </button>
                   </span>
                 ))}
@@ -446,7 +447,7 @@ export default function ProductsPage() {
                   placeholder={
                     searchTerms.length === 0 ? "Search products..." : ""
                   }
-                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[206px]"
+                  className="outline-none bg-transparent"
                 />
               </div>
             </div>
@@ -454,7 +455,7 @@ export default function ProductsPage() {
             {/* SEARCH BUTTON */}
             <div
               onClick={handleSearch}
-              className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-[#2b3990] cursor-pointer"
+              className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap"
             >
               <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
                 Search
@@ -465,7 +466,7 @@ export default function ProductsPage() {
             {searchTerms.length > 0 && (
               <div
                 onClick={clearSearch}
-                className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-500 hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-gray-500 cursor-pointer"
+                className="shadow-sm rounded-[10px] flex items-center justify-center bg-[#c00]/80 hover:bg-[#c00] text-[#fff] transition-all duration-300 ease-in-out border-none text-nowrap text-xs uppercase px-4 py-[10px]"
               >
                 <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
                   Clear
