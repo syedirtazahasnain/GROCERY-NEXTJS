@@ -208,10 +208,10 @@ export default function Page() {
             </>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end xl:w-1/2">
             <button
               type="submit"
-              className="w-[200px] bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] transition flex justify-center items-center gap-2 mt-[20px]"
+              className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap"
               disabled={isSubmitting || !selectedFile}
             >
               {isSubmitting ? (
@@ -232,14 +232,14 @@ export default function Page() {
               <button
                 onClick={handlePreview}
                 disabled={isLoadingPreview}
-                className="px-4 py-2 bg-[#2b3990] text-white rounded hover:bg-blue-600 transition"
+                className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap"
               >
                 {isLoadingPreview ? "Loading..." : "Preview Template"}
               </button>
               <a
                 href={EXCEL_FILE_PATH}
                 download
-                className="px-4 py-2 bg-[#00aeef] text-white rounded hover:bg-green-600 transition"
+                className="rounded-[10px] flex items-center justify-center bg-[#00aeef] hover:bg-[#2b3990] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap"
               >
                 Download Template
               </a>

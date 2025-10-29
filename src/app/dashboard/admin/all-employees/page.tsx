@@ -7,7 +7,7 @@ import Sidebar from "@/app/_components/adminsidebar/index";
 import Header from "@/app/_components/adminheader/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
 import { Dialog } from "@headlessui/react";
-import { Input, DateRangePicker } from "@heroui/react";
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import { toast } from "react-toastify";
 import Loader from "@/app/_components/loader/index";
 
@@ -20,8 +20,8 @@ interface User {
   location: string | null;
   status: string;
   role: string;
-     eligible: any;
- 
+  eligible: any;
+
 }
 
 interface PaginatedUsers {
@@ -84,9 +84,9 @@ export default function Page() {
   const urlSearchParams = useSearchParams();
   const currentPage = urlSearchParams.get("page") || "1";
 
-  
 
-  const fetchUsers = async (searchPayload:SearchPayload | null = null) => {
+
+  const fetchUsers = async (searchPayload: SearchPayload | null = null) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -138,7 +138,7 @@ export default function Page() {
         .map((s) => s.trim())
         .filter(Boolean);
 
-     const payload  = {
+    const payload = {
       emp_id:
         empIdList.length > 0 ? empIdList : splitAndTrim(searchParams.emp_id),
       name: nameList.length > 0 ? nameList : splitAndTrim(searchParams.name),
@@ -152,34 +152,34 @@ export default function Page() {
       emp_id: "",
       name: "",
     });
-     setEmpIdList([]);
-  setNameList([]);
+    setEmpIdList([]);
+    setNameList([]);
 
     fetchUsers();
   };
 
- const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-) => {
-  const { name, value } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
 
-  // Convert 'eligible' value from string to number
-  const updatedValue = name === "eligible" ? Number(value) : value;
+    // Convert 'eligible' value from string to number
+    const updatedValue = name === "eligible" ? Number(value) : value;
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: updatedValue,
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: updatedValue,
+    }));
 
-  // Clear validation error when user types/selects
-  if (validationErrors[name]) {
-    setValidationErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[name];
-      return newErrors;
-    });
-  }
-};
+    // Clear validation error when user types/selects
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
 
 
   const handleEdit = (user: User) => {
@@ -294,14 +294,14 @@ export default function Page() {
         </div>
 
         <div className="relative mb-6">
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             {/* EMPLOYEE ID INPUT (taggable) */}
             <div className="max-w-xs">
-              <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+              <div className="w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px] bg-gray-100">
                 {empIdList.map((id, index) => (
                   <span
                     key={index}
-                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex justify-between items-center gap-1 mb-[2px]"
                   >
                     {id}
                     <button
@@ -312,7 +312,7 @@ export default function Page() {
                       }
                       className="text-red-300 text-xs"
                     >
-                      x
+                      <XMarkIcon className="h-4 w-4 text-[#fff]" />
                     </button>
                   </span>
                 ))}
@@ -332,7 +332,7 @@ export default function Page() {
                       }
                     }
                   }}
-                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[206px]"
+                  className="outline-none bg-transparent"
                   placeholder={
                     empIdList.length === 0
                       ? "Search Employee ID and press Enter"
@@ -344,11 +344,11 @@ export default function Page() {
 
             {/* EMPLOYEE NAME INPUT (taggable same as emp_id) */}
             <div className="max-w-xs">
-              <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+              <div className="w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px] bg-gray-100">
                 {nameList.map((name, index) => (
                   <span
                     key={index}
-                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex justify-between items-center gap-1 mb-[2px]"
                   >
                     {name}
                     <button
@@ -359,7 +359,7 @@ export default function Page() {
                       }
                       className="text-red-300 text-xs"
                     >
-                      x
+                      <XMarkIcon className="h-4 w-4 text-[#fff]" />
                     </button>
                   </span>
                 ))}
@@ -379,7 +379,7 @@ export default function Page() {
                       }
                     }
                   }}
-                  className="flex-grow outline-none bg-transparent py-1 px-1 text-xs md:w-[236px]"
+                  className="outline-none bg-transparent"
                   placeholder={
                     nameList.length === 0
                       ? "Search Employee Name and press Enter"
@@ -392,9 +392,9 @@ export default function Page() {
             {/* SEARCH BUTTON */}
             <div
               onClick={handleSearch}
-              className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-[#2b3990] cursor-pointer"
+              className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap"
             >
-              <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
+              <button className="uppercase flex items-center gap-2">
                 Search
               </button>
             </div>
@@ -403,9 +403,9 @@ export default function Page() {
             {(empIdList.length > 0 || nameList.length > 0) && (
               <div
                 onClick={handleClearSearch}
-                className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-500 hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-gray-500 cursor-pointer"
+                className="shadow-sm rounded-[10px] flex items-center justify-center bg-[#c00]/80 hover:bg-[#c00] text-[#fff] transition-all duration-300 ease-in-out border-none text-nowrap text-xs uppercase px-4 py-[10px]"
               >
-                <button className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2">
+                <button className="uppercase flex items-center gap-2">
                   Clear
                 </button>
               </div>
@@ -476,11 +476,10 @@ export default function Page() {
                 <Link
                   key={index}
                   href={`/dashboard/admin/all-employees?page=${page}`}
-                  className={`px-4 py-2 rounded-lg border ${
-                    isActive
-                      ? "bg-[#2b3990] text-white border-blue-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  } ${isPrevious || isNext ? "font-semibold" : ""}`}
+                  className={`px-4 py-2 rounded-lg border ${isActive
+                    ? "bg-[#2b3990] text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    } ${isPrevious || isNext ? "font-semibold" : ""}`}
                 >
                   {isPrevious ? "«" : isNext ? "»" : link.label}
                 </Link>
@@ -513,9 +512,8 @@ export default function Page() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Full Name"
-                  className={`w-full border rounded px-3 py-2 ${
-                    validationErrors.name ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors.name ? "border-red-500" : ""
+                    }`}
                 />
                 {validationErrors.name && (
                   <p className="mt-1 text-sm text-red-500">
@@ -531,9 +529,8 @@ export default function Page() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email"
-                  className={`w-full border rounded px-3 py-2 ${
-                    validationErrors.email ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors.email ? "border-red-500" : ""
+                    }`}
                 />
                 {validationErrors.email && (
                   <p className="mt-1 text-sm text-red-500">
@@ -547,15 +544,14 @@ export default function Page() {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className={`w-full border rounded px-3 py-2 ${
-                    validationErrors.status ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors.status ? "border-red-500" : ""
+                    }`}
                 >
                   <option value="">Select Status</option>
                   <option value="Permanent">Permanent</option>
                   <option value="Probation">Probation</option>
                   <option value="Contract">Contract</option>
-                                    
+
 
                   <option value="Internship">Internship</option>
                 </select>
@@ -566,24 +562,23 @@ export default function Page() {
                 )}
               </div>
               <div>
-  <select
-    name="eligible"
-    value={formData.eligible?.toString() || ""}
-    onChange={handleChange}
-    className={`w-full border rounded px-3 py-2 ${
-      validationErrors.eligible ? "border-red-500" : ""
-    }`}
-  >
-    <option value="">Select Eligibility</option>
-    <option value="1">Rashan Eligible</option>
-    <option value="0">Not Eligible</option>
-  </select>
-  {validationErrors.eligible && (
-    <p className="mt-1 text-sm text-red-500">
-      {validationErrors.eligible[0]}
-    </p>
-  )}
-</div>
+                <select
+                  name="eligible"
+                  value={formData.eligible?.toString() || ""}
+                  onChange={handleChange}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors.eligible ? "border-red-500" : ""
+                    }`}
+                >
+                  <option value="">Select Eligibility</option>
+                  <option value="1">Rashan Eligible</option>
+                  <option value="0">Not Eligible</option>
+                </select>
+                {validationErrors.eligible && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {validationErrors.eligible[0]}
+                  </p>
+                )}
+              </div>
 
             </div>
 

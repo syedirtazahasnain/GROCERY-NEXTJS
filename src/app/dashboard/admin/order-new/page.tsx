@@ -9,6 +9,7 @@ import Loader from "@/app/_components/loader/index";
 import { DateRangePicker } from "@heroui/react";
 import Sidebar from "@/app/_components/adminsidebar/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 interface User {
   id: number;
@@ -121,8 +122,7 @@ export default function OrdersPage() {
       }
 
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_BACKEND_URL
+        `${process.env.NEXT_PUBLIC_BACKEND_URL
         }/api/admin/orders/all?${params.toString()}`,
         {
           headers: {
@@ -245,15 +245,15 @@ export default function OrdersPage() {
 
         <div>
           <div className="flex gap-2 justify-between items-center">
-            <div className="flex gap-2">
-              <div className="max-w-xs">
+            <div className="flex items-center gap-2">
+              <div className="">
                 {/* Input field + tags container */}
-                <div className="bg-white border-2 rounded-md flex flex-wrap items-center px-2 py-1 min-h-[42px] text-xs text-black focus-within:border-blue-500 transition-all">
+                <div className="w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px] bg-gray-100">
                   {/* Tags */}
                   {empIdList.map((id, index) => (
                     <span
                       key={index}
-                      className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex items-center gap-1 mb-[2px]"
+                      className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex justify-between items-center gap-1 mb-[2px]"
                     >
                       {id}
                       <button
@@ -264,7 +264,7 @@ export default function OrdersPage() {
                         }
                         className="text-red-300 text-xs"
                       >
-                        x
+                        <XMarkIcon className="h-4 w-4 text-[#fff]" />
                       </button>
                     </span>
                   ))}
@@ -285,41 +285,41 @@ export default function OrdersPage() {
                       }
                     }}
                     placeholder="Search Emp ID and press enter"
-                    className="flex-grow outline-none bg-transparent py-1 px-1 text-xs"
+                    className="outline-none bg-transparent"
                   />
                 </div>
               </div>
 
               <DateRangePicker
-                className="max-w-xs"
+                className=""
                 value={dateRange}
                 onChange={setDateRange}
                 classNames={{
-                  inputWrapper: "bg-white border-2",
-                }}
+                  inputWrapper: "w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px]",
+                }}s
                 visibleMonths={2}
               />
-              <div className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out hover:border-[#2b3990]">
+              <div className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap">
                 <button
-                  className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2"
+                  className="flex items-center gap-2 uppercase"
                   onClick={handleSearch}
                   disabled={isSearching}
                 >
                   {isSearching ? "Searching..." : "Search"}
                 </button>
               </div>
-              <div className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center hover:bg-gray-200  transition-all duration-300 ease-in-out ">
+              <div className="shadow-sm rounded-[10px] flex items-center justify-center bg-[#c00]/80 hover:bg-[#c00] text-[#fff] transition-all duration-300 ease-in-out border-none text-nowrap text-xs uppercase px-4 py-[10px]">
                 <button
-                  className="text-xs uppercase px-4 rounded-[10px] flex items-center gap-2"
+                  className="flex items-center gap-2 uppercase"
                   onClick={clearFilters}
                 >
                   Clear Filters
                 </button>
               </div>
             </div>
-            <div className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#1a2a7a] text-[#fff] transition-all duration-300 ease-in-out border-[#2b3990]">
+            <div className="rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap">
               <button
-                className="text-xs uppercase px-4 py-2 rounded-[10px] flex items-center gap-2"
+                className="flex items-center gap-2 uppercase"
                 onClick={generateOrderReport}
                 disabled={isGeneratingReport}
                 title="Download order report for the current month"
@@ -354,11 +354,10 @@ export default function OrdersPage() {
                 <div
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`cursor-pointer bg-[#fff] p-[8px] rounded-[15px] flex items-center gap-[10px] hover:bg-blue-50 ${
-                    selectedOrder?.id === order.id
-                      ? "border border-blue-500"
-                      : ""
-                  }`}
+                  className={`cursor-pointer bg-[#fff] p-[8px] rounded-[15px] flex items-center gap-[10px] hover:bg-blue-50 ${selectedOrder?.id === order.id
+                    ? "border border-blue-500"
+                    : ""
+                    }`}
                 >
                   <div className="w-[45px] h-[45px] bg-[#2b3990] rounded-full flex items-center justify-center overflow-hidden">
                     <img src="/images/logo/irtaza.webp" alt="Item" />
@@ -385,11 +384,10 @@ export default function OrdersPage() {
                     <button
                       onClick={() => handlePageChange(orders.current_page - 1)}
                       disabled={!orders.prev_page_url}
-                      className={`px-3 py-1 rounded-md ${
-                        !orders.prev_page_url
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-blue-600 hover:bg-blue-100"
-                      }`}
+                      className={`px-3 py-1 rounded-md ${!orders.prev_page_url
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-blue-600 hover:bg-blue-100"
+                        }`}
                     >
                       &laquo; Previous
                     </button>
@@ -410,11 +408,10 @@ export default function OrdersPage() {
                         <button
                           key={index}
                           onClick={() => page && handlePageChange(page)}
-                          className={`px-3 py-1 rounded-md ${
-                            link.active
-                              ? "bg-blue-600 text-white"
-                              : "text-blue-600 hover:bg-blue-100"
-                          }`}
+                          className={`px-3 py-1 rounded-md ${link.active
+                            ? "bg-blue-600 text-white"
+                            : "text-blue-600 hover:bg-blue-100"
+                            }`}
                           disabled={!page}
                         >
                           {link.label}
@@ -426,11 +423,10 @@ export default function OrdersPage() {
                     <button
                       onClick={() => handlePageChange(orders.current_page + 1)}
                       disabled={!orders.next_page_url}
-                      className={`px-3 py-1 rounded-md ${
-                        !orders.next_page_url
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-blue-600 hover:bg-blue-100"
-                      }`}
+                      className={`px-3 py-1 rounded-md ${!orders.next_page_url
+                        ? "text-gray-400 cursor-not-allowed"
+                        : "text-blue-600 hover:bg-blue-100"
+                        }`}
                     >
                       Next &raquo;
                     </button>
