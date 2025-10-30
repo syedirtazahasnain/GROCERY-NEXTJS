@@ -490,12 +490,12 @@ export default function Page() {
                       setUserToReset(user);
                       setShowConfirm(true);
                     }}
-                    className="absolute bottom-[10px] right-[10px] text-gray-700 hover:text-[#00aeef] group"
+                    className="absolute bottom-[7px] right-[7px] text-gray-700 hover:text-[#00aeef]"
                   >
                     <img
                       src="/icon.svg"
                       alt="Reset Password"
-                      className="w-12 h-12 object-contain p-[5px] rounded cursor-pointer hover:bg-[#2b3990]/10 transition-colors duration-300"
+                      className="w-[30px] h-[30px] object-contain rounded cursor-pointer hover:bg-[#2b3990]/10 transition-colors duration-300"
                     />
                   </button>
                 </div>
