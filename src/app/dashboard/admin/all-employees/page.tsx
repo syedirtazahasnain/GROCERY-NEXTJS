@@ -493,7 +493,7 @@ export default function Page() {
                     className="absolute bottom-[7px] right-[7px] text-gray-700 hover:text-[#00aeef]"
                   >
                     <img
-                      src="/icon.svg"
+                      src="/icons.svg"
                       alt="Reset Password"
                       className="w-[30px] h-[30px] object-contain rounded cursor-pointer hover:bg-[#2b3990]/10 transition-colors duration-300"
                     />
