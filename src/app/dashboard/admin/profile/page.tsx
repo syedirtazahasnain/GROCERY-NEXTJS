@@ -281,9 +281,9 @@ export default function page({ my_role }: UserData) {
               <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
                 <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
                   <img
-                    src={user.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL_PUBLIC}${user.image}` : "/images/logo/irtaza.webp"}
+                    src={user.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL_PUBLIC}${user.image}` : "/avatar.svg"}
                     onError={(e) => {
-                      e.currentTarget.src = "/images/logo/irtaza.webp";
+                      e.currentTarget.src = "/avatar.svg";
                     }}
                     alt="user" />
                 </div>

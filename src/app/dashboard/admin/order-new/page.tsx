@@ -360,7 +360,7 @@ export default function OrdersPage() {
                     }`}
                 >
                   <div className="w-[45px] h-[45px] bg-[#2b3990] rounded-full flex items-center justify-center overflow-hidden">
-                    <img src="/images/logo/irtaza.webp" alt="Item" />
+                    <img src="/avatar.svg" alt="Item" />
                   </div>
                   <div>
                     <p className="text-xs my-0 uppercase leading-none">

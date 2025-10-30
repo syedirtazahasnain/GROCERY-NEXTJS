@@ -459,7 +459,7 @@ export default function Page() {
                   <div>
                     <div className="w-[60px] h-[60px] rounded-full flex justify-center items-center overflow-hidden bg-gray-200">
                       <img
-                        src="/images/logo/irtaza.webp"
+                        src="/avatar.svg"
                         alt="User Avatar"
                         className="w-full h-full object-cover"
                       />

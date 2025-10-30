@@ -139,7 +139,7 @@ export default function UserDashboard({ my_role }: UserData) {
           <div>
             <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
               <div className="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
-                <img src="/images/logo/irtaza.webp" alt="user" />
+                <img src="/avatar.svg" alt="user" />
               </div>
               <div className="order-3 xl:order-2">
                 <h4 className="my-0 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
