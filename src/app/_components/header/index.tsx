@@ -95,7 +95,7 @@ export default function Index() {
         {/* Avatar Button */}
         <div onClick={() => setIsMenuOpen((prev) => !prev)}>
           <div className="w-[45px] h-[45px] rounded-full border-2 border-[#2b3990] overflow-hidden flex items-center justify-center cursor-pointer">
-            <img src="/images/logo/irtaza.webp" alt="User Avatar" />
+            <img src="/avatar.svg" alt="User Avatar" />
           </div>
         </div>
 
