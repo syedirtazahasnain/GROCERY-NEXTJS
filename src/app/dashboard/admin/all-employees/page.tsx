@@ -7,7 +7,8 @@ import Sidebar from "@/app/_components/adminsidebar/index";
 import Header from "@/app/_components/adminheader/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
 import { Dialog } from "@headlessui/react";
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import ConfirmDialog from "@/app/_components/ConfirmDialog";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 import { toast } from "react-toastify";
 import Loader from "@/app/_components/loader/index";
 
@@ -21,7 +22,6 @@ interface User {
   status: string;
   role: string;
   eligible: any;
-
 }
 
 interface PaginatedUsers {
@@ -44,7 +44,6 @@ interface PaginatedUsers {
   total: number;
 }
 
-
 interface SearchParams {
   emp_id: string;
   name: string;
@@ -55,9 +54,9 @@ interface SearchPayload {
   name: string[];
 }
 
-
-
 export default function Page() {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [userToReset, setUserToReset] = useState<User | null>(null);
   const [users, setUsers] = useState<PaginatedUsers | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,8 +82,6 @@ export default function Page() {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const currentPage = urlSearchParams.get("page") || "1";
-
-
 
   const fetchUsers = async (searchPayload: SearchPayload | null = null) => {
     try {
@@ -181,7 +178,6 @@ export default function Page() {
     }
   };
 
-
   const handleEdit = (user: User) => {
     setSelectedUser(user);
     setFormData({
@@ -192,6 +188,38 @@ export default function Page() {
     });
     setValidationErrors({});
     setIsOpen(true);
+  };
+
+  const resetPassword = async (user: User) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/password-reset`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ email: user.email }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send password reset email");
+      }
+
+      toast.success(data.message || "Password reset email sent successfully");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    }
   };
 
   const handleSave = async () => {
@@ -457,6 +485,19 @@ export default function Page() {
                       Edit
                     </p>
                   </button>
+                  <button
+                    onClick={() => {
+                      setUserToReset(user);
+                      setShowConfirm(true);
+                    }}
+                    className="absolute bottom-[10px] right-[10px] text-gray-700 hover:text-[#00aeef] group"
+                  >
+                    <img
+                      src="/icon.svg"
+                      alt="Reset Password"
+                      className="w-12 h-12 object-contain p-[5px] rounded cursor-pointer hover:bg-[#2b3990]/10 transition-colors duration-300"
+                    />
+                  </button>
                 </div>
               </div>
             ))}
@@ -476,16 +517,32 @@ export default function Page() {
                 <Link
                   key={index}
                   href={`/dashboard/admin/all-employees?page=${page}`}
-                  className={`px-4 py-2 rounded-lg border ${isActive
-                    ? "bg-[#2b3990] text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                    } ${isPrevious || isNext ? "font-semibold" : ""}`}
+                  className={`px-4 py-2 rounded-lg border ${
+                    isActive
+                      ? "bg-[#2b3990] text-white border-blue-500"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  } ${isPrevious || isNext ? "font-semibold" : ""}`}
                 >
                   {isPrevious ? "«" : isNext ? "»" : link.label}
                 </Link>
               );
             })}
           </div>
+        )}
+        {showConfirm && userToReset && (
+          <ConfirmDialog
+            message={`Are you sure you want to reset the password for ${userToReset.name}?`}
+            onConfirm={async () => {
+              await resetPassword(userToReset);
+              setShowConfirm(false);
+              setUserToReset(null);
+            }}
+            onCancel={() => {
+              toast.info("Password remains the same");
+              setShowConfirm(false);
+              setUserToReset(null);
+            }}
+          />
         )}
       </div>
 
@@ -512,8 +569,9 @@ export default function Page() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Full Name"
-                  className={`w-full border rounded px-3 py-2 ${validationErrors.name ? "border-red-500" : ""
-                    }`}
+                  className={`w-full border rounded px-3 py-2 ${
+                    validationErrors.name ? "border-red-500" : ""
+                  }`}
                 />
                 {validationErrors.name && (
                   <p className="mt-1 text-sm text-red-500">
@@ -529,8 +587,9 @@ export default function Page() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Email"
-                  className={`w-full border rounded px-3 py-2 ${validationErrors.email ? "border-red-500" : ""
-                    }`}
+                  className={`w-full border rounded px-3 py-2 ${
+                    validationErrors.email ? "border-red-500" : ""
+                  }`}
                 />
                 {validationErrors.email && (
                   <p className="mt-1 text-sm text-red-500">
@@ -544,14 +603,14 @@ export default function Page() {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className={`w-full border rounded px-3 py-2 ${validationErrors.status ? "border-red-500" : ""
-                    }`}
+                  className={`w-full border rounded px-3 py-2 ${
+                    validationErrors.status ? "border-red-500" : ""
+                  }`}
                 >
                   <option value="">Select Status</option>
                   <option value="Permanent">Permanent</option>
                   <option value="Probation">Probation</option>
                   <option value="Contract">Contract</option>
-
 
                   <option value="Internship">Internship</option>
                 </select>
@@ -566,8 +625,9 @@ export default function Page() {
                   name="eligible"
                   value={formData.eligible?.toString() || ""}
                   onChange={handleChange}
-                  className={`w-full border rounded px-3 py-2 ${validationErrors.eligible ? "border-red-500" : ""
-                    }`}
+                  className={`w-full border rounded px-3 py-2 ${
+                    validationErrors.eligible ? "border-red-500" : ""
+                  }`}
                 >
                   <option value="">Select Eligibility</option>
                   <option value="1">Rashan Eligible</option>
@@ -579,7 +639,6 @@ export default function Page() {
                   </p>
                 )}
               </div>
-
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
