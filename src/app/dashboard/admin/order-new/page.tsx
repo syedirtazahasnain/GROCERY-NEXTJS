@@ -359,7 +359,7 @@ export default function OrdersPage() {
                     : ""
                     }`}
                 >
-                  <div className="w-[45px] h-[45px] bg-[#2b3990] rounded-full flex items-center justify-center overflow-hidden">
+                  <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center overflow-hidden">
                     <img src="/avatar.svg" alt="Item" />
                   </div>
                   <div>
