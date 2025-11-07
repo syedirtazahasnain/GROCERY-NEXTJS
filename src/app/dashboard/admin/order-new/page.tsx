@@ -181,7 +181,7 @@ export default function OrdersPage() {
     fetchOrders("1", allEmpIds, startDate, endDate);
   };
 
-  const generateOrderReport = async () => {
+    const generateOrderReport = async () => {
     try {
       setIsGeneratingReport(true);
       const token = localStorage.getItem("token");
@@ -190,11 +190,21 @@ export default function OrdersPage() {
         return;
       }
 
-      const url = new URL(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/order/summary`
-      );
+      const formatDate = (date: Date | null) => {
+        if (!date) return "";
+        const d = new Date(date);
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+      };
 
-      const response = await fetch(url.toString(), {
+      const params = new URLSearchParams({
+        start_date: formatDate(dateRange.start) || "",
+        end_date: formatDate(dateRange.end) || "",
+      });
+
+      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/order/summary?${params.toString()}`;
+
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -211,8 +221,7 @@ export default function OrdersPage() {
         throw new Error(data.message || "Unexpected response format");
       }
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to generate report";
+      const msg = err instanceof Error ? err.message : "Failed to generate report";
       toast.error(msg);
     } finally {
       setIsGeneratingReport(false);
