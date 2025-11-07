@@ -10,6 +10,7 @@ import { DateRangePicker } from "@heroui/react";
 import Sidebar from "@/app/_components/adminsidebar/index";
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
 import { XMarkIcon } from '@heroicons/react/24/solid';
+import { printDiv } from '@/lib/printUtils';
 
 interface User {
   id: number;
@@ -229,6 +230,10 @@ export default function OrdersPage() {
     fetchOrders();
   }, [currentPage, router]);
 
+
+   const handlePrintClick = () => {
+    printDiv('invoice-content'); // Use the ID of your invoice div
+  };
   return (
     <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
       <div className="w-[15%] relative">
@@ -438,7 +443,8 @@ export default function OrdersPage() {
             {/* Right: Invoice Viewer */}
             <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-4 xl:p-8 md:col-span-2 lg:col-span-4">
               {selectedOrder ? (
-                <>
+                <div>
+                  <div id="invoice-content" className="invoice-content">
                   <div className="flex items-center justify-between pb-2">
                     <p className="my-0 font-semibold text-lg">Invoice</p>
                     <p className="my-0 text-lg">
@@ -623,15 +629,15 @@ export default function OrdersPage() {
                       </tbody>
                     </table>
                   </div>
-
+</div>
                   <div className="flex justify-end">
                     <div className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out border-[#2b3990]">
-                      <button className="text-sm text-[#fff] uppercase px-4 py-2 rounded-[10px] flex items-center gap-2">
+                      <button className="text-sm text-[#fff] uppercase px-4 py-2 rounded-[10px] flex items-center gap-2" onClick={handlePrintClick}>
                         Print
                       </button>
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <p className="text-gray-500 text-sm">
                   Select an order to view invoice details.
