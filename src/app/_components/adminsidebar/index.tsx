@@ -69,6 +69,35 @@ export default function Index() {
     fetchUserData();
   }, [router]);
 
+    useEffect(() => {
+    const fetchLastOrderDate = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/last-order-date`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setLastDate(data.data.value || new Date().toISOString().slice(0, 16));
+        }
+      } catch (err) {
+        console.error("Failed to fetch last order date:", err);
+      }
+    };
+
+    fetchLastOrderDate();
+  }, [showDialog]);
+
+
   const handleLogout = async () => {
     setIsLoading(true);
     setError("");
@@ -155,6 +184,17 @@ export default function Index() {
       setIsLoading(false);
     }
   };
+
+    const formatDateTimeLocal = (date: string | Date) => {
+      const d = new Date(date);
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const year = d.getFullYear();
+      const month = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const hours = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
 
 
 
@@ -321,10 +361,9 @@ useEffect(() => {
                         className="w-full"
                         classNames={{ inputWrapper: "" }}
                         isRequired
-                        value={lastDate}
+                        value={formatDateTimeLocal(lastDate)}
                         onChange={(e) => setLastDate(e.target.value)}
-                          min={getCurrentDateTimeLocal()} // Prevent selecting past dates
-
+                        min={formatDateTimeLocal(new Date())} 
                       />
 
                       <div className="flex justify-end gap-[10px] mt-4">
