@@ -166,7 +166,7 @@ export default function UserDashboard({ my_role }: UserData) {
         </div>
         
         {/* Dashboard Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] lg:gap-[15px] xl:gap-[20px]">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] lg:gap-[15px] xl:gap-[20px] hidden">
           <div className="bg-[#00aeef] bg-opacity-10 rounded-[15px] xl:rounded-[20px] p-[10px] lg:p-[15px] xl:p-[20px]">
             <div className="w-[50px] h-[50px] bg-[#fff] rounded-[15px] flex items-center justify-center">
               <AddShoppingCart />
@@ -184,7 +184,7 @@ export default function UserDashboard({ my_role }: UserData) {
             </div>
             <div className="mt-[10px] pl-[5px]">
               <p className="my-0 text-[24px] font-semibold">
-                {dashboardData?.data?.total_cash_count || 0}
+                {/* {dashboardData?.data?.total_cash_count || 0} */}
               </p>
               <p className="text-[12px] my-0">Total Cash Count</p>
             </div>
@@ -195,7 +195,7 @@ export default function UserDashboard({ my_role }: UserData) {
             </div>
             <div className="mt-[10px] pl-[5px]">
               <p className="my-0 text-[24px] font-semibold">
-                {dashboardData?.data?.total_ration_count || 0}
+                {/* {dashboardData?.data?.total_ration_count || 0} */}
               </p>
               <p className="text-[12px] my-0">Total Ration Count</p>
             </div>
@@ -206,7 +206,7 @@ export default function UserDashboard({ my_role }: UserData) {
             </div>
             <div className="mt-[10px] pl-[5px]">
               <p className="my-0 text-[24px] font-semibold">
-                {dashboardData?.data?.current_month_status || "N/A"}
+                {/* {dashboardData?.data?.current_month_status || "N/A"} */}
               </p>
               <p className="text-[12px] my-0">Current Month</p>
             </div>
@@ -214,8 +214,8 @@ export default function UserDashboard({ my_role }: UserData) {
         </div>
 
         {/* Charts and Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-[10px] lg:gap-[15px] xl:gap-[20px]">
-          <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-[10px] lg:p-[15px] xl:p-[20px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-[10px] lg:gap-[15px] xl:gap-[20px] hidden">
+          <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-[10px] lg:p-[15px] xl:p-[20px] hidden">
             <div className="mb-[20px]">
               <p className="my-0 text-[24px] font-semibold">
                 Ration Details
@@ -246,7 +246,7 @@ export default function UserDashboard({ my_role }: UserData) {
             </div>
           </div>
           
-          <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-[10px] lg:p-[15px] xl:p-[20px] xl:col-span-2">
+          <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-[10px] lg:p-[15px] xl:p-[20px] xl:col-span-3">
             <div className="mb-[20px]">
               <p className="my-0 text-[24px] font-semibold">
                 Latest Months

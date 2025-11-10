@@ -473,7 +473,7 @@ export default function Page() {
                       {user.name}
                     </p>
                     <p className="text-[14px] my-0">{user.email}</p>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-start gap-[20px] items-center">
                       <p className="text-[12px] my-0 capitalize">
                         Status: {user.status.toLowerCase()}
                       </p>
