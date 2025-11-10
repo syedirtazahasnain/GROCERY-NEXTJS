@@ -31,7 +31,20 @@ export default function index() {
             <p className="mt-2 italic">
               <b>Example -</b> An employee whose probation ends on or before <b>July 31st</b> will
               be eligible for <b>August’s</b> ration.
+              <br />
             </p>
+              <p className="pt-2 pb-2">The following categories are not eligible for ration benefits unless explicitly stated in their employment contract:</p>
+             <ul className="list-disc pl-10 space-y-1">
+              <li>
+                Contractual staff and interns
+              </li>
+              <li>
+                Employees serving their notice period
+              </li>
+              <li>
+                Employees working remotely (from home)
+              </li>
+            </ul>
           </section>
         </div>
 
