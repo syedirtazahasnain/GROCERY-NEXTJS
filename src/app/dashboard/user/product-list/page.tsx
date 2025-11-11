@@ -349,11 +349,15 @@ export default function ProductListPage() {
   };
 
   // Update cart state from backend response
-  const updateCartState = (cartData: any) => {
-    setCartData(cartData);
+  const updateCartState = (data: any) => {
+    // Handle different response formats
+    const cartData = data.cart_data || data;
+    const payableAmount = data.payable_amount;
+    const employeeContribution = data.employee_contribution;
+    const companyDiscount = data.company_discount;
     const cartItemsArray = Array.isArray(cartData.items)
       ? cartData.items
-      : cartData.items.items;
+      : cartData.items?.items || [];
 
     const cartItems = cartItemsArray.map((item: any) => ({
       id: item.id,
@@ -364,6 +368,14 @@ export default function ProductListPage() {
       product: item.product,
     }));
     setCart(cartItems);
+    setCartData({
+      id: cartData.id || 0,
+      user_id: cartData.user_id || 0,
+      items: cartItems,
+      payable_amount: payableAmount,
+      employee_contribution: employeeContribution,
+      company_discount: companyDiscount,
+    });
 
     // Update local quantities
     const quantities: { [key: number]: number } = {};
@@ -455,7 +467,8 @@ export default function ProductListPage() {
 
       // Update cart with backend response
       if (data.data && data.data.cart_data) {
-        updateCartState(data.data.cart_data);
+        updateCartState(data.data);
+        // updateCartState(data.data.cart_data);
       }
     } catch (err) {
       const errorMessage =
