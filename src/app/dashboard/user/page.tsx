@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/app/_components/header/index";
-import Sidebar from "@/app/_components/sidebar/index";
+
 import Breadcrumb from "@/app/_components/ui/Breadcrumb";
 import "@/app/extra.css";
 import { AddShoppingCart, Delete, HighlightOff, Close, ArrowForwardIos } from "@mui/icons-material";
@@ -127,13 +126,11 @@ export default function UserDashboard({ my_role }: UserData) {
   }
 
   return (
-    <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
-      <div className="w-[15%] relative">
-        <Sidebar />
-      </div>
+    <div>
+      
 
-      <div className="w-full mx-auto space-y-4 p-4">
-        <div><Header /></div>
+      <div>
+     
 
         <div className="p-5 mb-6 bg-[#f9f9f9] rounded-2xl lg:p-6">
           <div>

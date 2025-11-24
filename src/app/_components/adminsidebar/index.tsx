@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { Input } from "@heroui/react";
+import { usePathname } from "next/navigation";
 import {
   Dashboard,
   AccountCircle,
@@ -38,36 +39,11 @@ export default function Index() {
   });
 
 
+const pathname = usePathname();
+const isActive = (path: string) => pathname.startsWith(path);
 
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/auth/login");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-details`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data.data);
-          setUserRole(data.data.my_role || data.data.role);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user data:", err);
-      }
-    };
-
-    fetchUserData();
-  }, [router]);
+ 
 
     useEffect(() => {
     const fetchLastOrderDate = async () => {
@@ -124,7 +100,6 @@ export default function Index() {
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      router.refresh();
       router.push("/auth/login");
     } catch (err: any) {
       console.error("Logout error:", err);
@@ -247,7 +222,9 @@ useEffect(() => {
           <li className="relative">
             <>
               <Link href="/dashboard/admin"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+   "}
+  `}
               >
                 <Dashboard className="w-5 h-5" />
                 <span className="ml-4">Dashboard</span>
@@ -257,51 +234,55 @@ useEffect(() => {
                   <span className="ml-3">Orders & More</span>
                 </p>
               </div>
-              <button
-                onClick={fetchAllOrders}
-                className="hidden inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
-              >
-                <Assessment className="w-5 h-5" />
-                <span className="ml-4">All Orders</span>
-              </button>
+              
               <Link
                 href="/dashboard/admin/order-new"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/order-new") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <Assessment className="w-5 h-5" />
                 <span className="ml-4">All Orders</span>
               </Link>
               <Link
-                href="/dashboard/admin/products/add"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                href="/dashboard/admin/add"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/add") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <ShoppingCartCheckout className="w-5 h-5" />
                 <span className="ml-4">Create Product</span>
               </Link>
               <Link
                 href="/dashboard/admin/products"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/products") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <Category className="w-5 h-5" />
                 <span className="ml-4">Products</span>
               </Link>
               <Link
-                href="/dashboard/admin/products/price-history"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                href="/dashboard/admin/price-history"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/price-history") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <PriceChange className="w-5 h-5" />
                 <span className="ml-4">Product history</span>
               </Link>
               <button
                 onClick={() => setShowDialog(true)}
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out hover:ml-2 hover:text-[#dcdcdc]
+   "
+  
               >
                 <Restore className="w-5 h-5" />
                 <span className="ml-4">Last Date</span>
               </button>
 
               {showDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
                   <div className="bg-white rounded-[15px] xl:rounded-[20px] shadow-lg w-full max-w-md p-6 relative">
                     <form onSubmit={async (e) => {
                       e.preventDefault();
@@ -376,7 +357,7 @@ useEffect(() => {
                         </button>
                         <button
                           type="submit"
-                          className={`px-[15px] bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#00aeef] transition`}
+                          className={`px-[15px] bg-[#2b3990] text-white py-2 rounded-lg hover:bg-[#232e74cc] transition`}
                         >
                           Submit
                         </button>
@@ -397,21 +378,27 @@ useEffect(() => {
               </div>
               <Link
                 href="/dashboard/admin/all-employees"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/all-employees") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <Badge className="w-5 h-5" />
                 <span className="ml-4">Employees</span>
               </Link>
               <Link
                 href="/dashboard/admin/import-employees"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/import-employees") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <ImportExport className="w-5 h-5" />
                 <span className="ml-4">Import Employee</span>
               </Link>
               <Link
                 href="/dashboard/admin/import-products"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/import-products") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <ImportExport className="w-5 h-5" />
                 <span className="ml-4">Import Products</span>
@@ -427,14 +414,18 @@ useEffect(() => {
               </div>
               <Link
                 href="/dashboard/admin/profile"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/profile") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <AccountCircle className="w-5 h-5" />
                 <span className="ml-4">Profile</span>
               </Link>
               <Link
                 href="/dashboard/admin/update-password"
-                className="inline-flex items-center w-full text-sm transition-all duration-300 px-6 hover:ml-2 ease-in-out"
+                 className={`inline-flex items-center w-full text-sm transition-all duration-300 px-6 ease-in-out 
+    ${isActive("/dashboard/admin/update-password") ? "bg-[#232e74cc] text-white rounded-lg p-[5px]" : "hover:ml-2 hover:text-[#dcdcdc]"}
+  `}
               >
                 <Password className="w-5 h-5" />
                 <span className="ml-4">Passwords</span>

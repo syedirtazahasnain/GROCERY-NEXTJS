@@ -78,8 +78,7 @@ export default function OrdersPage() {
   // }
 
   return (
-    <div className="container mx-auto p-4">
-      <Header />
+    <div >
       <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
       <div className="space-y-4 mb-8">
         {orders.data.map((order) => (

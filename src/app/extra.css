@@ -5,3 +5,6 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+.transition-all {
+  transition: all 0.25s ease-in-out;
+}

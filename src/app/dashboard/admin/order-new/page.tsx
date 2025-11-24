@@ -243,13 +243,71 @@ export default function OrdersPage() {
    const handlePrintClick = () => {
     printDiv('invoice-content'); // Use the ID of your invoice div
   };
+  
+   
+const handledelete = async () => {
+  if (!selectedOrder) {
+    toast.error("Please select an order to delete");
+    return;
+  }
+
+  if (!window.confirm(
+    `Are you sure you want to delete order #${selectedOrder.order_number}? This action cannot be undone.`
+  )) {
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth/login");
+      return;
+    }
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/orders/delete/${selectedOrder.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to delete order");
+    }
+
+    toast.success("Order deleted successfully");
+    
+    // Refresh orders list - go to prev page if current is empty, else reload current
+    const shouldGoToPrevPage = orders?.data.length === 1 && orders?.current_page > 1;
+    
+    if (shouldGoToPrevPage) {
+      handlePageChange(orders.current_page - 1);
+    } else {
+      const formatDate = (date: Date | null) => {
+        if (!date) return "";
+        const d = new Date(date);
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      };
+      
+      fetchOrders(orders?.current_page.toString() || "1", empIdList, formatDate(dateRange.start), formatDate(dateRange.end));
+    }
+    
+    setSelectedOrder(null);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to delete order";
+    toast.error(msg);
+  } 
+
+  };
   return (
-    <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
-      <div className="w-[15%] relative">
-        <Sidebar />
-      </div>
-      <div className="w-full mx-auto space-y-4 p-4">
-        <Header />
+    <div >
+      <div className="fixed top-[60px] w-[82%]">
         <div className="px-6 py-6 bg-[#f9f9f9] rounded-[20px] xl:rounded-[25px] text-[#2b3990]">
           <h1 className="text-2xl font-bold">All Orders Details</h1>
           <Breadcrumb
@@ -343,13 +401,13 @@ export default function OrdersPage() {
             </div>
           </div>
         </div>
-
+</div>
         {loading ? (
           <Loader />
         ) : error ? (
           <ErrorMessage error={error} />
         ) : !orders?.data.length ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
+          <div className="bg-white rounded-lg mt-[165px] shadow p-8 text-center">
             <div className="text-gray-500 text-lg mb-4">
               No orders found matching your criteria
             </div>
@@ -361,7 +419,7 @@ export default function OrdersPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-[10px] md:gap-[15px] lg:gap-[20px] mb-8 items-start">
+          <div className="top-[239px] w-[82%] fixed grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-[10px] md:gap-[15px] lg:gap-[20px] mb-8 items-start">
             {/* Left: Order List */}
             <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-4 grid grid-cols-1 gap-[10px]">
               {orders.data.map((order) => (
@@ -376,14 +434,14 @@ export default function OrdersPage() {
                   <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center overflow-hidden">
                     <img src="/avatar.svg" alt="Item" />
                   </div>
-                  <div>
+                  <div >
                     <p className="text-xs my-0 uppercase leading-none">
                       {order.user.emp_id}
                     </p>
-                    <p className="font-semibold text-[15px] my-0 leading-none">
+                    <p className="font-semibold pt-[2px] text-[15px] my-0 leading-none">
                       {order.user.name}
                     </p>
-                    <p className="text-xs my-0 uppercase">
+                    <p className="text-xs pt-[2px] my-0 uppercase">
                       {order.order_number}
                     </p>
                   </div>
@@ -392,46 +450,66 @@ export default function OrdersPage() {
 
               {/* Pagination Controls */}
               {orders.last_page > 1 && (
-                <div className="flex justify-center items-center mt-4">
-                  <nav className="flex items-center gap-2">
+                <div className="flex justify-center items-center">
+                  <nav className="flex items-center gap-[2px]">
                     {/* Previous Page */}
                     <button
                       onClick={() => handlePageChange(orders.current_page - 1)}
                       disabled={!orders.prev_page_url}
                       className={`px-3 py-1 rounded-md ${!orders.prev_page_url
                         ? "text-gray-400 cursor-not-allowed"
-                        : "text-blue-600 hover:bg-blue-100"
+                        : "text-blue-600 bg-blue-100 hover:bg-blue-100"
                         }`}
                     >
-                      &laquo; Previous
+                      &laquo; 
                     </button>
 
                     {/* Page Numbers */}
-                    {orders.links.map((link, index) => {
-                      if (
-                        link.url === null ||
-                        link.label.includes("Previous") ||
-                        link.label.includes("Next")
-                      )
-                        return null;
+                 <div className="flex justify-center items-center gap-[7px] ">
+  {/* Previous Button */}
+ 
 
-                      const page =
-                        link.label === "..." ? null : parseInt(link.label);
+  {/* Page Numbers (limited to 7 visible) */}
+  {orders.links
+    .filter(link => !link.label.includes("Previous") && !link.label.includes("Next"))
+    .filter(link => link.url !== null)
+    .slice(
+      Math.max(
+        0,
+        Math.min(
+          orders.current_page - 4,
+          orders.links.filter(l => l.url !== null && !l.label.includes("Previous") && !l.label.includes("Next")).length - 7
+        )
+      ),
+      Math.max(
+        7,
+        Math.min(
+          orders.current_page + 3,
+          orders.links.filter(l => l.url !== null && !l.label.includes("Previous") && !l.label.includes("Next")).length
+        )
+      )
+    )
+    .map((link, index) => {
+      const page = parseInt(link.label);
+      return (
+        <button
+          key={index}
+          onClick={() => handlePageChange(page)}
+          className={`w-[25px] h-[36px] flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200
+            ${link.active
+              ? "bg-blue-600 text-white shadow-md scale-105"
+              : "bg-gray-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
+            }`}
+        >
+          {link.label}
+        </button>
+      );
+    })}
 
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => page && handlePageChange(page)}
-                          className={`px-3 py-1 rounded-md ${link.active
-                            ? "bg-blue-600 text-white"
-                            : "text-blue-600 hover:bg-blue-100"
-                            }`}
-                          disabled={!page}
-                        >
-                          {link.label}
-                        </button>
-                      );
-                    })}
+  {/* Next Button */}
+  
+</div>
+
 
                     {/* Next Page */}
                     <button
@@ -439,10 +517,10 @@ export default function OrdersPage() {
                       disabled={!orders.next_page_url}
                       className={`px-3 py-1 rounded-md ${!orders.next_page_url
                         ? "text-gray-400 cursor-not-allowed"
-                        : "text-blue-600 hover:bg-blue-100"
+                        : "text-blue-600 bg-blue-100 hover:bg-blue-100"
                         }`}
                     >
-                      Next &raquo;
+                       &raquo;
                     </button>
                   </nav>
                 </div>
@@ -450,7 +528,7 @@ export default function OrdersPage() {
             </div>
 
             {/* Right: Invoice Viewer */}
-            <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-4 xl:p-8 md:col-span-2 lg:col-span-4">
+            <div className="bg-[#f9f9f9] rounded-[15px] xl:rounded-[20px] p-4 xl:p-4 md:col-span-2 lg:col-span-4 h-[70vh] overflow-auto">
               {selectedOrder ? (
                 <div>
                   <div id="invoice-content" className="invoice-content">
@@ -639,10 +717,15 @@ export default function OrdersPage() {
                     </table>
                   </div>
 </div>
-                  <div className="flex justify-end">
-                    <div className="shadow-sm border-[2px] rounded-[10px] flex items-center justify-center bg-[#2b3990] hover:text-[#fff] transition-all duration-300 ease-in-out border-[#2b3990]">
-                      <button className="text-sm text-[#fff] uppercase px-4 py-2 rounded-[10px] flex items-center gap-2" onClick={handlePrintClick}>
+                  <div className="flex gap-[20px] justify-end">
+                    <div>
+                      <button className="rounded-[10px] absolute bottom-[2px] right-[100px] flex items-center justify-center bg-[#2b3990] hover:bg-[#00aeef] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap" onClick={handlePrintClick}>
                         Print
+                      </button>
+                    </div>
+                    <div>
+                      <button className="rounded-[10px] absolute bottom-[2px] right-[10px] flex items-center justify-center bg-[#ff2025] hover:bg-[#ff2025] text-[#fff] transition-all duration-300 ease-in-out text-xs uppercase px-4 py-[10px] text-nowrap" onClick={handledelete}>
+                        delete
                       </button>
                     </div>
                   </div>
@@ -656,6 +739,6 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
-    </div>
+   
   );
 }
