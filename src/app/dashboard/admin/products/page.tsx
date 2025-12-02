@@ -405,51 +405,44 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
-      <div className="w-[15%] relative">
-        <Sidebar />
-      </div>
-      <div className="w-full mx-auto space-y-4 p-4">
-        <div>
-          <Header />
-        </div>
+    <div>
+      <div className="sticky top-[60px] z-20 bg-white">
         <div className="px-6 py-6 bg-[#f9f9f9] rounded-[20px] xl:rounded-[25px] text-[#2b3990]">
           <h1 className="text-2xl font-bold my-0">All Products</h1>
           <Breadcrumb items={[{ label: "Dashboard" }, { label: "Products" }]} />
         </div>
 
         {/* Search Component */}
-        <div className="relative mb-6" ref={searchRef}>
+        <div className="relative mb-[10px] bg-white" ref={searchRef}>
           <div className="flex items-center gap-2">
             {/* SEARCH INPUT WITH TAGS */}
             <div className="max-w-xs">
-              <div className="w-full px-3 py-2 rounded-[10px] text-sm border-[#2b3990] border-[2px] bg-gray-100">
-                {searchTerms.map((term, index) => (
-                  <span
-                    key={index}
-                    className="text-xs px-[10px] py-[4px] bg-[#2b3990] rounded-[10px] text-white flex justify-between items-center gap-1 mb-[2px]"
-                  >
-                    {term}
-                    <button
-                      onClick={() => removeSearchTerm(term)}
-                      className="text-red-300 text-xs"
-                    >
-                      <XMarkIcon className="h-4 w-4 text-[#fff]" />
-                    </button>
-                  </span>
-                ))}
+             <div className="w-full h-[42px] overflow-auto flex flex-wrap items-center gap-2 px-3 py-2 border-2 border-[#2b3990] rounded-[10px] bg-gray-50 min-h-[42px] focus-within:ring-2 focus-within:ring-[#2b3990]/30 transition-all duration-200">
+  {searchTerms.map((term, index) => (
+    <span
+      key={index}
+      className="flex items-center gap-1 bg-[#2b3990] text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm hover:bg-[#1f2c73] transition-all duration-200"
+    >
+      {term}
+      <button
+        onClick={() => removeSearchTerm(term)}
+        className="flex items-center justify-center hover:opacity-80 transition-opacity"
+      >
+        <XMarkIcon className="h-3.5 w-3.5 text-white" />
+      </button>
+    </span>
+  ))}
 
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder={
-                    searchTerms.length === 0 ? "Search products..." : ""
-                  }
-                  className="outline-none bg-transparent"
-                />
-              </div>
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={handleSearchChange}
+    onKeyDown={handleKeyDown}
+    placeholder={searchTerms.length === 0 ? "Search products..." : ""}
+    className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
+  />
+</div>
+
             </div>
 
             {/* SEARCH BUTTON */}
@@ -534,8 +527,8 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-[10px] xl:gap-[15px] mb-8">
+</div>
+        <div className="mt-[10px] z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-[10px] xl:gap-[15px] mb-8">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
@@ -685,7 +678,7 @@ export default function ProductsPage() {
         </Dialog>
 
         {/* Pagination Controls */}
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2 ">
           {products.links.map((link, index) => {
             if (link.url === null) return null;
 
@@ -711,6 +704,5 @@ export default function ProductsPage() {
           })}
         </div>
       </div>
-    </div>
   );
 }

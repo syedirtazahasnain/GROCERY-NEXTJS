@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/app/_components/adminheader/index";
-import Sidebar from "@/app/_components/adminsidebar/index";
-import Breadcrumb from "@/app/_components/ui/Breadcrumb";
 import "@/app/extra.css";
 import {
   AddShoppingCart,
@@ -127,15 +124,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex gap-[20px] px-[20px] xl:px-[30px]">
-      <div className="w-[15%] relative">
-        <Sidebar />
-      </div>
-
-      <div className="w-full mx-auto space-y-4 p-4">
-        <div>
-          <Header />
-        </div>
+    <div>
 
         {/* Dashboard Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] lg:gap-[15px] xl:gap-[20px]">
@@ -381,6 +370,5 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
