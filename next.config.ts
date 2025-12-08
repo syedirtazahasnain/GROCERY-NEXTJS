@@ -10,13 +10,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  experimental: {
-    turbo: {
-      enabled: false, // must be an object
-    },
-  },
-
   output: "standalone",
 };
 
