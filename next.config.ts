@@ -3,9 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   basePath: '',
   reactStrictMode: true,
-  /* config options here */
+
+  // Disable Turbopack (Fixes build crash on shared hosting)
+  turbo: false,
+
   eslint: {
-    ignoreDuringBuilds: true, // Add this
+    ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
