@@ -11,12 +11,12 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Disable Turbopack; force Webpack on cPanel hosts
   experimental: {
-    turbo: false,
+    turbo: {
+      enabled: false, // must be an object
+    },
   },
 
-  // Avoid basePath issues in cPanel
   output: "standalone",
 };
 
