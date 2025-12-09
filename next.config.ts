@@ -8,9 +8,13 @@ const nextConfig: NextConfig = {
 
   output: "standalone",
 
-  // Force Webpack, disables Turbopack completely
+  // FORCE WEBPACK LOADER (disables Turbopack completely)
+  experimental: {
+    forceSwcTransforms: true,
+  },
+
   webpack: (config) => {
-    return config;
+    return config; // enabling this forces Webpack
   },
 };
 
