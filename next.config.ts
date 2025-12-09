@@ -2,21 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
-
+  eslint: { 
+    ignoreDuringBuilds: true 
+  },
+  typescript: { 
+    ignoreBuildErrors: true 
+  },
   output: "standalone",
-
-  // ❗ FULLY DISABLE TURBOPACK
-  experimental: {
-    turbo: false,
-  },
-
-  // ensure Webpack compiler is used
-  webpack: (config) => {
-    return config;
-  },
+  
+  // REMOVE the experimental.turbopack line completely
+  // experimental: { turbopack: false }, // ← DELETE THIS ENTIRE LINE
 };
 
 export default nextConfig;
