@@ -1,20 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  basePath: '',
   reactStrictMode: true,
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
-  output: "standalone",
-  
-  // Force Webpack 5
-  webpack: (config, { isServer }) => {
-    return config;
+  /* config options here */
+
+
+
+  eslint: {
+    ignoreDuringBuilds: true, // Add this
   },
-  
-  // Disable parallel processing
-  experimental: {
-    workerThreads: false,
-    cpus: 1,
+  typescript: {
+    ignoreBuildErrors: true,
   },
 };
 
