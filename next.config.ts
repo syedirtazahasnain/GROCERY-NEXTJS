@@ -8,13 +8,14 @@ const nextConfig: NextConfig = {
 
   output: "standalone",
 
-  // FORCE WEBPACK LOADER (disables Turbopack completely)
+  // ❗ FULLY DISABLE TURBOPACK
   experimental: {
-    forceSwcTransforms: true,
+    turbo: false,
   },
 
+  // ensure Webpack compiler is used
   webpack: (config) => {
-    return config; // enabling this forces Webpack
+    return config;
   },
 };
 
