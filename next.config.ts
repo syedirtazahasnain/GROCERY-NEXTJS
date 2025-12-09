@@ -8,8 +8,10 @@ const nextConfig: NextConfig = {
 
   output: "standalone",
 
-  // remove turbopack completely
-  // experimental: {},
+  // Force Webpack, disables Turbopack completely
+  webpack: (config) => {
+    return config;
+  },
 };
 
 export default nextConfig;
