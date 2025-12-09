@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
 
   output: "standalone",
 
-  // THIS LINE FIXES EVERYTHING:
-  experimental: { turbopack: false },
+  // remove turbopack completely
+  // experimental: {},
 };
 
 export default nextConfig;
