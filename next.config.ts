@@ -2,16 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  eslint: { 
-    ignoreDuringBuilds: true 
-  },
-  typescript: { 
-    ignoreBuildErrors: true 
-  },
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   output: "standalone",
   
-  // REMOVE the experimental.turbopack line completely
-  // experimental: { turbopack: false }, // ← DELETE THIS ENTIRE LINE
+  // Add this to force single-threaded/webpack mode
+  experimental: {
+    cpus: 1, // Limit to 1 CPU core
+  },
 };
 
 export default nextConfig;
