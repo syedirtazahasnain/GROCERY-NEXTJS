@@ -6,9 +6,15 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   output: "standalone",
   
-  // Add this to force single-threaded/webpack mode
+  // Force Webpack 5
+  webpack: (config, { isServer }) => {
+    return config;
+  },
+  
+  // Disable parallel processing
   experimental: {
-    cpus: 1, // Limit to 1 CPU core
+    workerThreads: false,
+    cpus: 1,
   },
 };
 
