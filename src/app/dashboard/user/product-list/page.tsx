@@ -465,10 +465,19 @@ export default function ProductListPage() {
         toast.error(data.message || "Failed to remove item from cart");
       }
 
-      // Update cart with backend response
-      if (data.data && data.data.cart_data) {
+      if (data.data && data.data.cart_data !== undefined) {
         updateCartState(data.data);
-        // updateCartState(data.data.cart_data);
+      } else if (Array.isArray(data.data)) {
+        setCart([]);
+        setCartData({
+          id: 0,
+          user_id: 0,
+          items: [],
+          payable_amount: 0,
+          employee_contribution: 0,
+          company_discount: 0,
+        });
+        setLocalQuantities({});
       }
     } catch (err) {
       const errorMessage =
